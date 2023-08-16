@@ -21,11 +21,12 @@ public class BankingApp {
 
         String screen = DASHBOARD;
 
-        String id;
+        String id="";
         String name;
         double deposit;
 
         String[][] bankDetails = new String[0][3];
+        String yesNoOpp;
 
         loopMain:
         do{
@@ -48,10 +49,16 @@ public class BankingApp {
                 System.out.println("[6]. Drop existing account");
                 System.out.println("[7]. Exit\n");
                 System.out.print("Enter an option to continue > ");
-                int option = scanner.nextInt();
-                scanner.nextLine();
+                String option = scanner.nextLine().strip();
+               
 
-                switch (option){
+                if(option.isBlank()|| !Character.isDigit(option.charAt(0))){
+                    System.out.printf("%sEnter a valied option%s", COLOUR_RED_BOLD,RESET);
+                    break;
+                }
+                int optionInt = Integer.valueOf(option);
+                yesNoOpp = scanner.nextLine().strip().toUpperCase();
+                switch (optionInt){
                     case 1: screen = NEW_ACCOUNT; break;
                     case 2: screen = DEPOSIT; break;
                     case 3: screen = WITHDRAW; break;
@@ -65,37 +72,37 @@ public class BankingApp {
 
                 case NEW_ACCOUNT:
 
-
                     // add id
-                    id = String.format("%05d", idArray.length+1);
-                    System.out.println("ID: SDB - "+ id );
+                
+                    System.out.printf("ID : SDB - %s\n", bankDetails.length+1);
 
                     // add name
-                    loopAddName:
+                    loopAddname:
                     do{
-                        System.out.print("Enter Account holder's name: ");
-                        name = scanner.nextLine().strip();
-
+                        System.out.print("Enter account holder's name: ");
+                        name = scanner.nextLine();
                         if(name.isBlank()){
-                            System.out.printf("%sName can't be empty%s\n",COLOUR_RED_BOLD,RESET);
-                            
-                            System.out.print("Do You want to enter again? (Y/N)");
-                            String addNameYesNoOption = scanner.nextLine().strip().toUpperCase();
-                            
-                            if (addNameYesNoOption=="Y"){
+                            System.out.printf("%s%s%s",COLOUR_RED_BOLD,"Name can't be empty",RESET);
+                            System.out.print("Do you want to enter name again? > Y/N: ");
+                            yesNoOpp = scanner.nextLine().strip().toUpperCase();
+
+                            if(yesNoOpp.equals("Y")){
                                 System.out.println();
-                                System.out.println("ID: SDB - "+ id );
-                                continue loopAddName;
+                                System.out.printf("ID : SDB - %s\n", bankDetails.length+1);
+                                continue loopAddname;
                             }else{
-                                screen=DASHBOARD;
+                                screen = DASHBOARD;
                                 continue loopMain;
                             }
                         }
+
                         for (int i = 0; i < name.length(); i++) {
-                            if(!(Character.isLetter(name.charAt(i))|| name.charAt(i)==' ')){
-                                System.out.printf("%sInvalied Name%s",COLOUR_RED_BOLD,RESET);
-                                continue loopAddName;
-                            }  
+                            if(!Character.isLetter(name.charAt(i))){
+                                System.out.printf("%sInvalied name%s", COLOUR_RED_BOLD,RESET);
+                                System.out.println();
+                                System.out.printf("ID : SDB - %s\n", bankDetails.length+1);
+                                continue loopAddname;
+                            }
                         }
                         break;
 
@@ -104,46 +111,74 @@ public class BankingApp {
                     //add deposit
                     loopAddDeposit:
                     do{
-                        System.out.print("Enter deposit amount: ");
-                        deposit = scanner.nextDouble();
-                        scanner.nextLine();
+                    System.out.print("Enter Deposit amount: ");
+                    deposit = scanner.nextDouble();
+                    scanner.nextLine();
 
-                        if (deposit<5000){
-                            System.out.printf("%sInitital deposit must be greater than 5000%s\n", COLOUR_RED_BOLD,RESET);
-                            continue loopAddDeposit;
+                    String depositString = String.valueOf(deposit);
+
+                    for (int i = 0; i < depositString.length(); i++) {
+                      if(Character.isLetter(depositString.charAt(i))){
+                        System.out.printf("\"%sInvalied Entry%s\\n", COLOUR_RED_BOLD,RESET);
+                        continue loopAddDeposit;
+  
+                    }else if(deposit<5000){
+                        System.out.printf("%sInitial minimum deposit = 5000%s\n", COLOUR_RED_BOLD,RESET);
+                        System.out.printf("ID : SDB - %s\n", bankDetails.length+1);
+                        System.out.println("Name: "+ name);
+                        continue loopAddDeposit;
+
                         }
-                        break;
-                    }while(true);
+                    
+                    }
+                     break;
+                    } while(true);
 
+                    //create temp array with +1 length
+                    String[][] temp = new String[bankDetails.length+1][3];
+                    
+                    //enter data in new array
+                    for (int i = 0; i < bankDetails.length; i++) {
+                        temp[i][0]=bankDetails[i][0];
+                        temp[i][1]=bankDetails[i][1];
+                        temp[i][2]=bankDetails[i][2];
+                    }
+
+                    temp[temp.length-1][0]=id;
+                    temp[temp.length-1][0]=name;
+                    temp[temp.length-1][0]=String.valueOf(deposit);
+
+                    bankDetails=temp;
                     System.out.println();
-                    System.out.printf(id+ " : "+ name + " -%s  Added successfully%s\n",COLOUR_GREEN_BOLD,RESET);
-                    System.out.printf("%sDo you want to add another account? (Y/N) >%s",COLOUR_BLUE_BOLD,RESET);
-                    String addAccYesNoOption = scanner.nextLine().strip().toUpperCase();
+                    System.out.printf("%s%sAdded Successfully%s", COLOUR_GREEN_BOLD,name,RESET);
+                    System.out.println("");
+                    System.out.println("Do you want to add another account? Y/N");
+                    yesNoOpp = scanner.nextLine().strip().toUpperCase();
 
-                        if(addAccYesNoOption=="Y"){
-                            screen = NEW_ACCOUNT;
-                            continue;
-                        }else{
-                            screen=DASHBOARD;
-                            continue;
-                        }
+                    if(yesNoOpp.equals("Y")){
+                        screen=NEW_ACCOUNT;
+                        continue;
+                    }else{
+                        screen=DASHBOARD;
+                        continue;
+                    }
 
-                // case DEPOSIT:
-
-
-                // case WITHDRAW:
+                case DEPOSIT:
 
 
-                // case TRANSFER:
+                case WITHDRAW:
 
 
-                // case CHECK_BALANCE:
+                case TRANSFER:
 
 
-                // case DROP_ACCOUNT:
+                case CHECK_BALANCE:
 
 
-                default: System.exit(0);
+                case DROP_ACCOUNT:
+
+
+            
 
                 
             }
